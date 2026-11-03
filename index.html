@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spartacus’s Game Shelf</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Gochi+Hand&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky-top:#ffe3f0; --sky-bot:#dff1ff;
+  --ink:#4b3668; --ink-soft:#7d6a96;
+  --paper:#fffaf3; --paper-edge:#f3e3d3;
+  --bubblegum:#ff9ec7; --butter:#ffe08a; --mint:#a8e6cf; --lilac:#c9b6ff; --peach:#ffc6a8;
+  --hill-a:#bfe9c9; --hill-b:#a6dcb4; --hill-c:#93d0a3;
+  --orb:#ffd76a; --orb-glow:rgba(255,215,106,.55);
+  --star-op:0; --cloud:#ffffff; --cloud-op:.95;
+  --shadow:rgba(110,70,140,.20);
+  --rim:#4a4464;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --sky-top:#2b2350; --sky-bot:#141a36;
+    --ink:#f6ecff; --ink-soft:#c3b4dc;
+    --paper:#2d2850; --paper-edge:#3d3666;
+    --hill-a:#33475e; --hill-b:#2a3b50; --hill-c:#223042;
+    --orb:#f4f0ff; --orb-glow:rgba(220,210,255,.45);
+    --star-op:1; --cloud:#5a5486; --cloud-op:.55;
+    --shadow:rgba(0,0,0,.35);
+    --rim:#8b84b8;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --sky-top:#2b2350; --sky-bot:#141a36;
+  --ink:#f6ecff; --ink-soft:#c3b4dc;
+  --paper:#2d2850; --paper-edge:#3d3666;
+  --hill-a:#33475e; --hill-b:#2a3b50; --hill-c:#223042;
+  --orb:#f4f0ff; --orb-glow:rgba(220,210,255,.45);
+  --star-op:1; --cloud:#5a5486; --cloud-op:.55;
+  --shadow:rgba(0,0,0,.35);
+  --rim:#8b84b8;
+  color-scheme: dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0}
+body{
+  min-height:100vh;
+  font-family:"Fredoka", "Nunito", "Varela Round", system-ui, sans-serif;
+  color:var(--ink);
+  background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-bot) 70%) fixed;
+  background-color:var(--sky-bot);
+  overflow-x:hidden;
+  transition:background .8s ease, color .5s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px dashed var(--bubblegum);outline-offset:4px;border-radius:12px}
+
+/* ---------- sky ---------- */
+.sky{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:calc(var(--star-op) * var(--o,1));transition:opacity 1s;animation:twinkle var(--d,3s) ease-in-out infinite}
+.star.big::before{content:"✦";position:absolute;left:-6px;top:-10px;font-size:14px;color:#fff6c9}
+@keyframes twinkle{50%{transform:scale(.4);filter:brightness(.6)}}
+.orb{
+  position:absolute;top:calc(28px + env(safe-area-inset-top,0px));right:7vw;width:78px;height:78px;border-radius:50%;
+  background:var(--orb);box-shadow:0 0 0 14px var(--orb-glow),0 0 60px 20px var(--orb-glow);
+  pointer-events:auto;cursor:pointer;border:0;padding:0;z-index:3;
+  transition:background .8s, box-shadow .8s, transform .3s cubic-bezier(.3,1.8,.5,1);
+}
+.orb:hover{transform:scale(1.08) rotate(-8deg)}
+.orb:active{transform:scale(.92)}
+.orb .face{position:absolute;inset:0}
+.orb .crater{position:absolute;border-radius:50%;background:rgba(160,140,210,.35);opacity:var(--star-op);transition:opacity .8s}
+.cloud{
+  position:absolute;pointer-events:auto;cursor:pointer;opacity:var(--cloud-op);
+  transition:opacity .8s, transform .2s;
+  animation:drift var(--t,60s) linear infinite;
+  animation-delay:var(--delay,0s);
+}
+.cloud svg{display:block;fill:var(--cloud);transition:fill .8s}
+.cloud.pop{animation:poof .45s ease forwards}
+@keyframes drift{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
+@keyframes poof{to{transform:scale(1.6);opacity:0}}
+
+/* ---------- layout ---------- */
+main{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 20px 40px}
+.hero{text-align:center;padding-top:56px;position:relative}
+.greet{
+  font-family:"Gochi Hand","Comic Sans MS",cursive;font-size:clamp(22px,4vw,30px);
+  color:var(--ink-soft);margin:0 0 4px;min-height:1.3em;
+}
+.greet span{display:inline-block;animation:greetIn .5s cubic-bezier(.3,1.6,.5,1)}
+@keyframes greetIn{from{transform:translateY(10px) scale(.8);opacity:0}}
+h1{
+  margin:0;font-weight:700;line-height:.95;letter-spacing:-.01em;
+  font-size:clamp(46px,10vw,104px);
+  cursor:pointer;user-select:none;
+}
+h1 .l{
+  display:inline-block;
+  color:var(--c);
+  -webkit-text-stroke:0;
+  text-shadow:0 4px 0 color-mix(in srgb, var(--c) 55%, var(--ink)), 0 10px 18px var(--shadow);
+  animation:bob 3.6s ease-in-out infinite;
+  animation-delay:calc(var(--i) * -.22s);
+  transition:transform .25s cubic-bezier(.3,1.8,.5,1);
+}
+h1 .l:hover{transform:translateY(-10px) rotate(-6deg) scale(1.12)}
+h1 .sp{display:inline-block;width:.28em}
+@keyframes bob{50%{translate:0 -6px}}
+.sub{max-width:34ch;margin:14px auto 0;font-size:clamp(17px,2.2vw,20px);line-height:1.45;color:var(--ink-soft)}
+
+/* ---------- Spartacus on his hill ---------- */
+.hillwrap{position:relative;height:250px;margin:18px auto 0;max-width:720px}
+.hill{position:absolute;left:50%;bottom:0;translate:-50% 0;width:min(720px,140vw);height:110px}
+.hill path{transition:fill .8s}
+.pup{
+  position:absolute;left:50%;bottom:58px;width:210px;translate:-50% 0;
+  cursor:pointer;border:0;background:none;padding:0;
+  transition:transform .3s cubic-bezier(.3,1.8,.5,1);
+  transform-origin:50% 100%;
+}
+.pup:hover{transform:translateY(-6px)}
+.pup:active{transform:translateY(2px) scaleY(.94)}
+.pup.spin{animation:zoomies 1.1s cubic-bezier(.5,0,.3,1)}
+.pup.hop{animation:hop .9s cubic-bezier(.3,1.6,.5,1)}
+@keyframes zoomies{0%{transform:none}40%{transform:translateY(-60px) rotate(200deg)}100%{transform:rotate(720deg)}}
+@keyframes hop{30%{transform:translateY(-40px)}60%{transform:translateY(0) scaleY(.9)}80%{transform:translateY(-12px)}}
+.pup svg{display:block;width:100%;overflow:visible}
+.pup .ear-l,.pup .ear-r{transform-box:fill-box;transition:transform .35s cubic-bezier(.3,1.8,.5,1)}
+.pup .ear-l{transform-origin:90% 10%}
+.pup .ear-r{transform-origin:10% 10%}
+.pup:hover .ear-l{transform:rotate(14deg)}
+.pup:hover .ear-r{transform:rotate(-14deg)}
+.pup .tail{transform-box:fill-box;transform-origin:0% 100%;animation:wag 1.6s ease-in-out infinite}
+.pup:hover .tail,.pup.happy .tail{animation-duration:.22s}
+@keyframes wag{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(18deg)}}
+.pup .lids{transform-box:fill-box;transform-origin:center;transform:scaleY(0);animation:blink 5.5s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(0)}96%{transform:scaleY(1)}}
+.pup .tongue{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(0);transition:transform .25s cubic-bezier(.3,1.8,.5,1)}
+.pup:hover .tongue,.pup.happy .tongue{transform:scaleY(1)}
+.pup .blush{opacity:.0;transition:opacity .3s}
+.pup:hover .blush,.pup.happy .blush{opacity:.75}
+.rim{stroke:var(--rim);transition:stroke .8s}
+
+.bubble{
+  position:absolute;left:calc(50% + 70px);bottom:215px;z-index:4;
+  background:var(--paper);color:var(--ink);padding:10px 16px;border-radius:22px 22px 22px 6px;
+  font-family:"Gochi Hand",cursive;font-size:22px;white-space:nowrap;
+  box-shadow:0 8px 20px var(--shadow);
+  transform:scale(0);transform-origin:0% 100%;transition:transform .3s cubic-bezier(.3,1.8,.5,1);
+  pointer-events:none;
+}
+.bubble.show{transform:scale(1)}
+.name-tag{
+  position:absolute;left:50%;bottom:20px;translate:-50% 0;z-index:2;
+  font-family:"Gochi Hand",cursive;font-size:19px;color:#4b3668;
+  background:var(--butter);padding:2px 14px;border-radius:999px;rotate:-3deg;
+  box-shadow:0 3px 0 #e8c15c;
+}
+
+/* ---------- game shelf ---------- */
+.shelf{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:34px;max-width:900px;margin-left:auto;margin-right:auto;
+  margin-top:34px;padding:0 4px;
+}
+.game{
+  --tilt:0deg;
+  position:relative;display:flex;flex-direction:column;text-decoration:none;color:var(--ink);
+  background:var(--paper);border-radius:34px 34px 28px 28px;
+  box-shadow:0 2px 0 var(--paper-edge),0 10px 0 var(--paper-edge),0 22px 34px var(--shadow);
+  padding:14px 14px 22px;
+  rotate:var(--rest);
+  transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  transition:rotate .4s cubic-bezier(.3,1.6,.5,1), translate .4s cubic-bezier(.3,1.6,.5,1), background .8s, box-shadow .8s;
+  outline-offset:6px;
+}
+.game:nth-child(1){--rest:-2deg}
+.game:nth-child(2){--rest:1.5deg}
+.game:nth-child(3){--rest:-1deg}
+.game:nth-child(4){--rest:2deg}
+.paw .raft{animation:sail 6s ease-in-out infinite;transform-box:fill-box}
+@keyframes sail{0%,100%{transform:translateX(0) rotate(-3deg)}50%{transform:translateX(62px) rotate(3deg)}}
+.paw .flag{animation:flutter .6s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:0 50%}
+@keyframes flutter{to{transform:scaleX(.8) skewY(6deg)}}
+.paw .coin{animation:shine 1.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.paw .buoy{animation:rock 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+.paw .buoy:nth-of-type(2n){animation-delay:-1.3s}
+.game:hover,.game:focus-visible{rotate:0deg;translate:0 -8px}
+.game:active{translate:0 2px}
+.art{position:relative;border-radius:24px;overflow:hidden;aspect-ratio:5/4}
+.art svg{display:block;width:100%;height:100%}
+.tape{
+  position:absolute;top:-12px;left:50%;translate:-50% 0;rotate:-4deg;width:96px;height:26px;
+  background:color-mix(in srgb,var(--tape) 75%, transparent);border-radius:4px;z-index:2;
+  mask:linear-gradient(90deg,transparent 0 3px,#000 3px calc(100% - 3px),transparent 0);
+}
+.game h2{margin:18px 10px 4px;font-size:28px;font-weight:700;line-height:1.05}
+.game p{margin:0 10px;color:var(--ink-soft);line-height:1.45;font-size:16.5px;flex:1}
+.play{
+  align-self:flex-start;margin:18px 10px 0;display:inline-flex;align-items:center;gap:10px;
+  background:var(--btn);color:#3a2852;font-weight:600;font-size:18px;
+  padding:11px 22px 11px 16px;border-radius:999px;
+  box-shadow:0 4px 0 color-mix(in srgb,var(--btn) 60%, #3a2852);
+  transition:transform .2s cubic-bezier(.3,1.8,.5,1);
+}
+.play .tri{width:0;height:0;border-left:13px solid #3a2852;border-top:8px solid transparent;border-bottom:8px solid transparent;margin-left:4px}
+.game:hover .play{transform:scale(1.06) rotate(-2deg)}
+.sticker{
+  position:absolute;right:-10px;top:-14px;z-index:3;rotate:12deg;
+  font-family:"Gochi Hand",cursive;font-size:17px;color:#3a2852;
+  background:var(--sticker);padding:8px 10px;border-radius:50%;width:66px;height:66px;
+  display:grid;place-items:center;text-align:center;line-height:1;
+  box-shadow:0 4px 10px var(--shadow);
+  transition:rotate .4s cubic-bezier(.3,1.8,.5,1);
+}
+.game:hover .sticker{rotate:-8deg}
+
+/* card-specific art motion */
+.bdl .win-eyes{transition:transform .12s linear}
+.bdl .eyelids{transform-box:fill-box;transform-origin:center;transform:scaleY(0);animation:blink 4s infinite 1s}
+.bdl .flicker{animation:flick 3s infinite}
+@keyframes flick{0%,100%{opacity:1}47%{opacity:1}48%{opacity:.4}50%{opacity:1}52%{opacity:.6}53%{opacity:1}}
+.bdl .bat{animation:flap .5s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}
+@keyframes flap{to{transform:scaleY(.4)}}
+.isl .boat{animation:rock 3s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes rock{0%,100%{transform:rotate(-5deg) translateY(0)}50%{transform:rotate(5deg) translateY(-3px)}}
+.isl .wave{animation:wave 4s ease-in-out infinite}
+.isl .wave2{animation:wave 5s ease-in-out infinite reverse}
+@keyframes wave{50%{transform:translateX(-14px)}}
+.isl .fruit{animation:shine 2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes shine{50%{transform:scale(1.25)}}
+.stu .bow{transition:fill .4s}
+.stu .sparkle{animation:spark 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.stu .sparkle:nth-of-type(2){animation-delay:-.8s}
+.stu .sparkle:nth-of-type(3){animation-delay:-1.6s}
+@keyframes spark{0%,100%{transform:scale(.4) rotate(0);opacity:.4}50%{transform:scale(1) rotate(45deg);opacity:1}}
+
+/* ---------- footer ---------- */
+footer{
+  position:relative;z-index:1;text-align:center;padding:40px 20px 60px;color:var(--ink-soft);
+  font-size:16px;
+}
+.secret-meter{
+  display:inline-flex;align-items:center;gap:8px;margin-top:10px;
+  font-family:"Gochi Hand",cursive;font-size:19px;
+  background:color-mix(in srgb,var(--paper) 70%, transparent);padding:6px 16px;border-radius:999px;
+}
+.secret-meter .dots{display:inline-flex;gap:4px}
+.secret-meter .dots i{width:12px;height:12px;border-radius:50%;background:var(--paper-edge);transition:background .4s, transform .4s cubic-bezier(.3,1.8,.5,1)}
+.secret-meter .dots i.on{background:var(--bubblegum);transform:scale(1.25)}
+.bone{
+  display:inline-block;border:0;background:none;padding:4px;margin-left:6px;cursor:pointer;
+  opacity:.28;transition:opacity .3s, transform .3s;vertical-align:middle;
+}
+.bone:hover{opacity:1;transform:rotate(-20deg) scale(1.2)}
+.bone svg{display:block;width:30px;fill:var(--ink-soft)}
+
+/* ---------- toasts, particles, watcher ---------- */
+.toast{
+  position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:50;
+  translate:-50% 140%;transition:translate .45s cubic-bezier(.3,1.6,.5,1);
+  background:var(--paper);color:var(--ink);border-radius:20px;padding:12px 20px;
+  box-shadow:0 12px 30px var(--shadow);font-weight:500;font-size:17px;text-align:center;max-width:90vw;
+}
+.toast.show{translate:-50% 0}
+.fx{position:fixed;pointer-events:none;z-index:40;will-change:transform,opacity}
+.fall{animation:fall var(--dur,3s) linear forwards}
+@keyframes fall{from{transform:translateY(-10vh) rotate(0)}to{transform:translateY(110vh) rotate(var(--r,360deg))}}
+.burst{animation:burst .9s ease-out forwards}
+@keyframes burst{to{transform:translate(var(--dx),var(--dy)) scale(.3);opacity:0}}
+.watcher{
+  position:fixed;left:-6px;bottom:calc(60px + env(safe-area-inset-bottom,0px));z-index:30;
+  width:110px;height:60px;border:0;padding:0;cursor:pointer;
+  background:radial-gradient(ellipse at 0% 50%, #000 0 55%, transparent 72%);
+  translate:-120% 0;transition:translate 1.2s cubic-bezier(.5,0,.3,1);
+}
+.watcher.peek{translate:0 0}
+.watcher .e{position:absolute;top:22px;width:14px;height:9px;border-radius:50%;background:#ffef8a;box-shadow:0 0 12px 3px #ffd84a;animation:blink 3s infinite}
+.watcher .e:nth-child(1){left:28px}
+.watcher .e:nth-child(2){left:52px}
+
+@media (max-width:680px){ .shelf{grid-template-columns:1fr} }
+@media (max-width:600px){
+  .orb{width:58px;height:58px;right:18px}
+  .hero{padding-top:40px}
+  .hillwrap{height:220px}
+  .pup{width:180px}
+  .bubble{left:calc(50% + 44px);bottom:190px;font-size:19px}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+  .cloud{animation:none}
+}
+</style>
+</head>
+<body>
+
+<div class="sky" id="sky" aria-hidden="false">
+  <button class="orb" id="orb" aria-label="Switch between day and night">
+    <span class="face">
+      <i class="crater" style="width:16px;height:16px;left:18px;top:20px"></i>
+      <i class="crater" style="width:10px;height:10px;left:44px;top:42px"></i>
+      <i class="crater" style="width:7px;height:7px;left:26px;top:50px"></i>
+    </span>
+  </button>
+</div>
+
+<main>
+  <section class="hero">
+    <p class="greet" id="greet" aria-live="polite"><span>Hoi Zoë!</span></p>
+    <h1 id="title" aria-label="Spartacus’s Game Shelf"></h1>
+    <p class="sub">Four little games made at home, for playing together. Pick one and press play.</p>
+
+    <div class="hillwrap">
+      <div class="bubble" id="bubble">Woof!</div>
+      <button class="pup" id="pup" aria-label="Pat Spartacus">
+        <svg viewBox="0 0 220 190" aria-hidden="true">
+          <defs>
+            <radialGradient id="coat" cx="40%" cy="30%" r="75%">
+              <stop offset="0" stop-color="#3a3548"/>
+              <stop offset=".55" stop-color="#1d1a26"/>
+              <stop offset="1" stop-color="#121018"/>
+            </radialGradient>
+            <radialGradient id="iris" cx="45%" cy="40%" r="60%">
+              <stop offset="0" stop-color="#e3b45a"/>
+              <stop offset=".6" stop-color="#a8752a"/>
+              <stop offset="1" stop-color="#6b5420"/>
+            </radialGradient>
+          </defs>
+          <!-- tail -->
+          <path class="tail rim" d="M168 150 q30 -14 34 -52 q2 -10 -6 -8 q-6 30 -34 44 z" fill="#1d1a26" stroke-width="2"/>
+          <!-- body/chest -->
+          <path class="rim" d="M48 190 q-6 -60 62 -70 q68 10 62 70 z" fill="url(#coat)" stroke-width="2"/>
+          <path d="M92 190 q-6 -38 18 -52 q24 14 18 52 z" fill="#fbf7f2"/>
+          <!-- paws on the hill -->
+          <g>
+            <ellipse class="rim" cx="72" cy="182" rx="22" ry="13" fill="#1d1a26" stroke-width="2"/>
+            <path d="M54 186 q18 -14 36 0 q-18 6 -36 0z" fill="#fbf7f2"/>
+            <ellipse class="rim" cx="148" cy="182" rx="22" ry="13" fill="#1d1a26" stroke-width="2"/>
+            <path d="M130 186 q18 -14 36 0 q-18 6 -36 0z" fill="#fbf7f2"/>
+          </g>
+          <!-- ears (floppy) -->
+          <path class="ear-l rim" d="M58 40 q-30 6 -30 52 q2 20 18 16 q16 -6 20 -30 q4 -22 14 -32 z" fill="#17141f" stroke-width="2"/>
+          <path class="ear-r rim" d="M162 40 q30 6 30 52 q-2 20 -18 16 q-16 -6 -20 -30 q-4 -22 -14 -32 z" fill="#17141f" stroke-width="2"/>
+          <!-- head -->
+          <path class="rim" d="M110 18 c38 0 58 26 58 58 c0 34 -24 56 -58 56 c-34 0 -58 -22 -58 -56 c0 -32 20 -58 58 -58z" fill="url(#coat)" stroke-width="2.2"/>
+          <!-- shine -->
+          <ellipse cx="86" cy="40" rx="20" ry="9" fill="#fff" opacity=".16" transform="rotate(-20 86 40)"/>
+          <!-- white muzzle stripe -->
+          <path d="M106 30 q4 -4 8 0 l4 54 q-8 6 -16 0 z" fill="#fbf7f2"/>
+          <!-- muzzle -->
+          <ellipse cx="110" cy="100" rx="30" ry="22" fill="#2a2633"/>
+          <path d="M100 82 q10 -6 20 0 q6 14 -10 16 q-16 -2 -10 -16z" fill="#fbf7f2"/>
+          <!-- nose -->
+          <path d="M98 88 q12 -8 24 0 q0 10 -12 12 q-12 -2 -12 -12z" fill="#0c0a10"/>
+          <ellipse cx="105" cy="88" rx="4" ry="2" fill="#fff" opacity=".45"/>
+          <!-- mouth -->
+          <path d="M110 100 v6 M110 106 q-8 8 -16 2 M110 106 q8 8 16 2" fill="none" stroke="#0c0a10" stroke-width="2.6" stroke-linecap="round"/>
+          <path class="tongue" d="M103 109 q7 2 14 0 q0 16 -7 16 q-7 0 -7 -16z" fill="#ff8fb0"/>
+          <!-- blush -->
+          <ellipse class="blush" cx="74" cy="96" rx="10" ry="6" fill="#ff8fb8"/>
+          <ellipse class="blush" cx="146" cy="96" rx="10" ry="6" fill="#ff8fb8"/>
+          <!-- eyes -->
+          <g>
+            <ellipse cx="84" cy="66" rx="13" ry="14" fill="#fff"/>
+            <ellipse cx="136" cy="66" rx="13" ry="14" fill="#fff"/>
+            <g id="pupils">
+              <circle cx="84" cy="67" r="9" fill="url(#iris)"/>
+              <circle cx="84" cy="67" r="4.6" fill="#0c0a10"/>
+              <circle cx="81" cy="63" r="2.6" fill="#fff"/>
+              <circle cx="136" cy="67" r="9" fill="url(#iris)"/>
+              <circle cx="136" cy="67" r="4.6" fill="#0c0a10"/>
+              <circle cx="133" cy="63" r="2.6" fill="#fff"/>
+            </g>
+            <g class="lids">
+              <ellipse cx="84" cy="66" rx="14" ry="15" fill="#1d1a26"/>
+              <ellipse cx="136" cy="66" rx="14" ry="15" fill="#1d1a26"/>
+            </g>
+          </g>
+          <!-- collar -->
+          <path d="M66 128 q44 22 88 0 l2 10 q-46 22 -92 0z" fill="#ff9ec7"/>
+          <circle cx="110" cy="146" r="8" fill="#ffd76a" stroke="#e8b93c" stroke-width="2"/>
+          <text x="110" y="149.5" font-size="9" text-anchor="middle" fill="#a77b16" font-family="Fredoka" font-weight="700">S</text>
+        </svg>
+      </button>
+      <svg class="hill" viewBox="0 0 720 110" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 110 V70 Q120 30 240 58 T480 50 T720 66 V110z" fill="var(--hill-c)"/>
+        <path d="M0 110 V82 Q180 20 360 40 T720 80 V110z" fill="var(--hill-b)"/>
+        <path d="M60 110 Q200 34 360 34 T660 110z" fill="var(--hill-a)"/>
+        <g fill="#fff" opacity=".8">
+          <circle cx="250" cy="74" r="4"/><circle cx="256" cy="70" r="3" fill="#ffd76a"/>
+          <circle cx="470" cy="70" r="4"/><circle cx="476" cy="66" r="3" fill="#ff9ec7"/>
+          <circle cx="410" cy="88" r="3.5"/><circle cx="300" cy="94" r="3" fill="#c9b6ff"/>
+        </g>
+      </svg>
+      <span class="name-tag">Spartacus</span>
+    </div>
+  </section>
+
+  <section class="shelf" aria-label="Games">
+    <!-- Black Dog Lane -->
+    <a class="game bdl" href="https://keepitterron.github.io/black-dog-lane/" style="--tape:#c9b6ff;--btn:#c9b6ff;--sticker:#ffe08a">
+      <span class="tape"></span>
+      <span class="sticker">a bit spooky</span>
+      <div class="art">
+        <svg viewBox="0 0 250 200" aria-hidden="true">
+          <defs>
+            <linearGradient id="dusk" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#3b2a63"/><stop offset=".7" stop-color="#8a5f9e"/><stop offset="1" stop-color="#e6a2a8"/>
+            </linearGradient>
+          </defs>
+          <rect width="250" height="200" fill="url(#dusk)"/>
+          <circle cx="196" cy="44" r="20" fill="#fff4d6"/>
+          <circle cx="204" cy="38" r="18" fill="#3b2a63" opacity=".0"/>
+          <g fill="#fff" opacity=".8"><circle cx="40" cy="30" r="1.4"/><circle cx="90" cy="18" r="1"/><circle cx="150" cy="34" r="1.2"/><circle cx="226" cy="90" r="1"/></g>
+          <path class="bat" d="M60 50 q6 -6 10 0 q4 -4 8 0 q-4 2 -9 6 q-5 -4 -9 -6z" fill="#221636"/>
+          <path class="bat" d="M150 70 q5 -5 8 0 q3 -3 6 0 q-3 2 -7 5 q-4 -3 -7 -5z" fill="#221636" style="animation-delay:-.2s"/>
+          <!-- ground -->
+          <path d="M0 170 Q120 150 250 168 V200 H0z" fill="#2a1e45"/>
+          <!-- crooked house -->
+          <g transform="rotate(-3 125 120)">
+            <path d="M80 170 V96 L125 58 L170 96 V170z" fill="#4a3870"/>
+            <path d="M72 100 L125 52 L178 100" fill="none" stroke="#2a1e45" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+            <rect x="140" y="62" width="12" height="24" fill="#2a1e45"/>
+            <rect class="flicker" x="104" y="96" width="42" height="34" rx="4" fill="#ffd96a"/>
+            <path d="M125 96 v34 M104 113 h42" stroke="#4a3870" stroke-width="3"/>
+            <g class="win-eyes" id="bdlEyes">
+              <ellipse cx="117" cy="113" rx="4" ry="5" fill="#2a1e45"/>
+              <ellipse cx="133" cy="113" rx="4" ry="5" fill="#2a1e45"/>
+            </g>
+            <rect x="112" y="142" width="26" height="28" rx="12" fill="#2a1e45"/>
+            <circle cx="132" cy="157" r="2" fill="#ffd96a"/>
+          </g>
+          <!-- little sign -->
+          <rect x="22" y="134" width="44" height="18" rx="3" fill="#c9a77a" transform="rotate(-8 44 143)"/>
+          <rect x="40" y="148" width="5" height="24" fill="#8a6a44"/>
+          <text x="44" y="147" font-size="8.5" text-anchor="middle" fill="#4a3870" font-family="Gochi Hand" transform="rotate(-8 44 143)">no. 13</text>
+        </svg>
+      </div>
+      <h2>Black Dog Lane</h2>
+      <p>A creepy little puzzle house. Find clues, open rooms and keep an eye on the things that move when you look away.</p>
+      <span class="play">Play <i class="tri"></i></span>
+    </a>
+
+    <!-- Spartacus's Island -->
+    <a class="game isl" href="https://keepitterron.github.io/spartacus-island/" style="--tape:#a8e6cf;--btn:#a8e6cf;--sticker:#ffc6a8">
+      <span class="tape"></span>
+      <span class="sticker">3D!</span>
+      <div class="art">
+        <svg viewBox="0 0 250 200" aria-hidden="true">
+          <defs>
+            <linearGradient id="day" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#bfe3ff"/><stop offset="1" stop-color="#fff0d9"/>
+            </linearGradient>
+          </defs>
+          <rect width="250" height="200" fill="url(#day)"/>
+          <circle cx="54" cy="46" r="18" fill="#ffd76a"/>
+          <g fill="#fff"><ellipse cx="170" cy="36" rx="26" ry="9"/><ellipse cx="186" cy="30" rx="14" ry="9"/></g>
+          <!-- island -->
+          <ellipse cx="160" cy="138" rx="66" ry="22" fill="#ffe2a8"/>
+          <path d="M120 132 q40 -26 84 0z" fill="#9fd9a8"/>
+          <!-- palm -->
+          <path d="M168 128 q-6 -30 6 -56" stroke="#a8754a" stroke-width="7" fill="none" stroke-linecap="round"/>
+          <g fill="#6cc48a">
+            <path d="M174 72 q-30 -8 -40 10 q20 -10 40 -10z"/>
+            <path d="M174 72 q24 -18 42 -2 q-22 -4 -42 2z"/>
+            <path d="M174 72 q4 -26 22 -28 q-12 12 -22 28z"/>
+            <path d="M174 72 q-18 -22 -36 -18 q20 4 36 18z"/>
+          </g>
+          <circle class="fruit" cx="166" cy="80" r="6" fill="#ff9ec7"/>
+          <circle class="fruit" cx="180" cy="82" r="5" fill="#c9b6ff" style="animation-delay:-1s"/>
+          <!-- sea -->
+          <path class="wave2" d="M-20 150 q20 -8 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 V200 H-20z" fill="#8fd0f0"/>
+          <path class="wave" d="M-20 164 q20 -8 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 V200 H-20z" fill="#6fbde6"/>
+          <!-- boat with pup -->
+          <g class="boat">
+            <path d="M40 150 h62 l-10 18 h-42z" fill="#c98a5a"/>
+            <path d="M70 150 v-46" stroke="#8a6a44" stroke-width="3"/>
+            <path d="M72 106 l28 34 h-28z" fill="#fffaf3"/>
+            <path d="M68 106 l-20 10 l20 6z" fill="#ff9ec7"/>
+            <!-- tiny Spartacus -->
+            <circle cx="56" cy="142" r="10" fill="#1d1a26"/>
+            <path d="M46 138 q-6 6 -2 12 q4 0 6 -6z" fill="#17141f"/>
+            <path d="M55 134 h2 l1 10 h-4z" fill="#fbf7f2"/>
+            <circle cx="52" cy="141" r="1.6" fill="#e3b45a"/><circle cx="60" cy="141" r="1.6" fill="#e3b45a"/>
+            <path d="M48 132 q8 -8 16 0 z" fill="#2a1e45"/>
+            <circle cx="56" cy="130" r="1.6" fill="#fff"/>
+          </g>
+        </svg>
+      </div>
+      <h2>Spartacus’s Island</h2>
+      <p>Sail with Spartacus from island to island, eat magic fruit for new powers and make animal friends. No enemies, no game over.</p>
+      <span class="play">Set sail <i class="tri"></i></span>
+    </a>
+
+    <!-- Pup Studio -->
+    <a class="game stu" href="https://keepitterron.github.io/pup-studio/" style="--tape:#ff9ec7;--btn:#ff9ec7;--sticker:#a8e6cf">
+      <span class="tape"></span>
+      <span class="sticker">make a pup</span>
+      <div class="art">
+        <svg viewBox="0 0 250 200" aria-hidden="true">
+          <rect width="250" height="200" fill="#ffeef5"/>
+          <g opacity=".5">
+            <circle cx="30" cy="30" r="6" fill="#ffe08a"/><circle cx="220" cy="40" r="8" fill="#a8e6cf"/>
+            <circle cx="210" cy="170" r="7" fill="#c9b6ff"/><circle cx="36" cy="168" r="9" fill="#ffc6a8"/>
+          </g>
+          <!-- mirror frame -->
+          <rect x="70" y="26" width="110" height="140" rx="55" fill="#fff" stroke="#ffc6a8" stroke-width="6"/>
+          <!-- pup in progress -->
+          <path d="M98 70 q-18 4 -16 34 q4 10 12 6 q6 -8 8 -24z" fill="#ffc6a8"/>
+          <path d="M152 70 q18 4 16 34 q-4 10 -12 6 q-6 -8 -8 -24z" fill="#ffc6a8"/>
+          <ellipse cx="125" cy="96" rx="32" ry="30" fill="#ffe2c4"/>
+          <ellipse cx="125" cy="108" rx="16" ry="11" fill="#fff4e8"/>
+          <path d="M119 102 q6 -4 12 0 q0 6 -6 7 q-6 -1 -6 -7z" fill="#4b3668"/>
+          <circle cx="112" cy="90" r="4" fill="#4b3668"/><circle cx="138" cy="90" r="4" fill="#4b3668"/>
+          <circle cx="113" cy="89" r="1.3" fill="#fff"/><circle cx="139" cy="89" r="1.3" fill="#fff"/>
+          <path d="M120 114 q5 4 10 0" stroke="#4b3668" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <g class="bow" id="bow" fill="#ff9ec7">
+            <path d="M125 66 l-16 -8 v16z"/><path d="M125 66 l16 -8 v16z"/><circle cx="125" cy="66" r="4.5"/>
+          </g>
+          <!-- tools -->
+          <g transform="rotate(30 205 110)">
+            <rect x="200" y="74" width="8" height="54" rx="4" fill="#c9b6ff"/>
+            <path d="M200 74 q4 -16 8 0z" fill="#4b3668"/>
+          </g>
+          <g>
+            <path d="M18 104 q0 -24 26 -24 q24 0 22 20 q-2 10 -12 8 q-8 -2 -8 6 q0 10 -12 10 q-16 0 -16 -20z" fill="#fff" stroke="#f3d6e1" stroke-width="2"/>
+            <circle cx="32" cy="94" r="5" fill="#ff9ec7"/><circle cx="46" cy="88" r="5" fill="#ffe08a"/>
+            <circle cx="56" cy="98" r="4.5" fill="#a8e6cf"/><circle cx="30" cy="110" r="5" fill="#c9b6ff"/>
+          </g>
+          <path class="sparkle" d="M196 30 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3z" fill="#ffd76a"/>
+          <path class="sparkle" d="M64 150 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2 l6 -2z" fill="#ff9ec7"/>
+          <path class="sparkle" d="M184 150 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2 l6 -2z" fill="#a8e6cf"/>
+        </svg>
+      </div>
+      <h2>Pup Studio</h2>
+      <p>Build your own pup: ears, spots, colours, hats and bows. No goals, no rush. Making it is the game.</p>
+      <span class="play">Start making <i class="tri"></i></span>
+    </a>
+
+    <!-- Paw-Rate Navigator -->
+    <a class="game paw" href="https://keepitterron.github.io/paw-rate/" style="--tape:#ffe08a;--btn:#ffe08a;--sticker:#c9b6ff">
+      <span class="tape"></span>
+      <span class="sticker">3 × 4 = ?</span>
+      <div class="art">
+        <svg viewBox="0 0 250 200" aria-hidden="true">
+          <defs>
+            <linearGradient id="sea2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffe9d1"/><stop offset=".45" stop-color="#ffd9e6"/><stop offset=".46" stop-color="#9ed8ef"/><stop offset="1" stop-color="#6fbde6"/>
+            </linearGradient>
+          </defs>
+          <rect width="250" height="200" fill="url(#sea2)"/>
+          <g fill="#fff" opacity=".9"><ellipse cx="60" cy="34" rx="22" ry="7"/><ellipse cx="74" cy="29" rx="12" ry="7"/></g>
+          <!-- treasure island -->
+          <ellipse cx="222" cy="92" rx="30" ry="9" fill="#ffe2a8"/>
+          <rect x="208" y="72" width="26" height="18" rx="3" fill="#c98a5a"/>
+          <path d="M208 76 q13 -12 26 0z" fill="#a8754a"/>
+          <rect x="219" y="78" width="4" height="6" fill="#ffd76a"/>
+          <circle class="coin" cx="204" cy="86" r="3.4" fill="#ffd76a"/>
+          <circle class="coin" cx="240" cy="86" r="3" fill="#ffd76a" style="animation-delay:-.9s"/>
+          <!-- number line -->
+          <path d="M14 150 H236" stroke="#fffaf3" stroke-width="4" stroke-linecap="round" stroke-dasharray="2 10"/>
+          <g font-family="Fredoka" font-weight="600" font-size="12" text-anchor="middle" fill="#4b3668">
+            <g class="buoy"><circle cx="30" cy="150" r="10" fill="#ff9ec7"/><text x="30" y="154">0</text></g>
+            <g class="buoy"><circle cx="78" cy="150" r="10" fill="#ffe08a"/><text x="78" y="154">4</text></g>
+            <g class="buoy"><circle cx="126" cy="150" r="10" fill="#a8e6cf"/><text x="126" y="154">8</text></g>
+            <g class="buoy"><circle cx="174" cy="150" r="10" fill="#c9b6ff"/><text x="174" y="154">12</text></g>
+            <g class="buoy"><circle cx="222" cy="150" r="10" fill="#ffc6a8"/><text x="222" y="154">16</text></g>
+          </g>
+          <!-- hop arcs -->
+          <g fill="none" stroke="#fffaf3" stroke-width="2" stroke-dasharray="3 4" opacity=".9">
+            <path d="M30 136 q24 -22 48 0"/><path d="M78 136 q24 -22 48 0"/><path d="M126 136 q24 -22 48 0"/>
+          </g>
+          <!-- raft with pirate pup -->
+          <g class="raft">
+            <path d="M26 128 h44 l-6 10 h-32z" fill="#c98a5a"/>
+            <path d="M48 128 v-36" stroke="#8a6a44" stroke-width="3"/>
+            <path class="flag" d="M50 92 h20 l-5 6 l5 6 h-20z" fill="#4b3668"/>
+            <text x="58" y="101" font-size="7" text-anchor="middle" fill="#fff">🐾</text>
+            <circle cx="36" cy="120" r="9" fill="#1d1a26"/>
+            <path d="M27 116 q-5 5 -2 11 q4 0 5 -5z" fill="#17141f"/>
+            <path d="M35 113 h2 l1 9 h-4z" fill="#fbf7f2"/>
+            <circle cx="33" cy="119" r="1.5" fill="#e3b45a"/>
+            <path d="M36 117 h6 v4 h-6z" fill="#0c0a10"/><path d="M30 116 l12 -2" stroke="#0c0a10" stroke-width="1.2"/>
+            <path d="M27 112 q9 -10 18 0z" fill="#ff9ec7"/>
+          </g>
+          <path class="wave" d="M-20 176 q20 -8 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 V200 H-20z" fill="#5fb1dc"/>
+        </svg>
+      </div>
+      <h2>Paw-Rate Navigator</h2>
+      <p>Steer the pirate pup along the number line and hop from buoy to buoy to practise your times tables.</p>
+      <span class="play">Ahoy! <i class="tri"></i></span>
+    </a>
+  </section>
+</main>
+
+<footer>
+  <div>Made at home, with lots of love and a dog under the desk
+    <button class="bone" id="bone" aria-label="A bone">
+      <svg viewBox="0 0 60 26"><path d="M10 3a6 6 0 0 1 6 6v.5h28V9a6 6 0 1 1 6 6 6 6 0 1 1-6 6v-.5H16v.5a6 6 0 1 1-6-6 6 6 0 1 1 0-12z"/></svg>
+    </button>
+  </div>
+  <div class="secret-meter" id="meter" title="Secrets hidden on this page">
+    <span id="meterText">7 secrets are hiding here</span>
+    <span class="dots" id="dots"></span>
+  </div>
+</footer>
+
+<button class="watcher" id="watcher" aria-label="Something is watching"><i class="e"></i><i class="e"></i></button>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- title letters ---------- */
+  const title = $('#title');
+  const colors = ['#ff9ec7','#ffc6a8','#ffd76a','#a8e6cf','#8fd0f0','#c9b6ff'];
+  const words = ['Spartacus’s','Game','Shelf'];
+  let i = 0;
+  words.forEach((w, wi) => {
+    const word = document.createElement('span');
+    word.style.whiteSpace = 'nowrap';
+    word.style.display = 'inline-block';
+    [...w].forEach(ch => {
+      const s = document.createElement('span');
+      s.className = 'l'; s.textContent = ch; s.setAttribute('aria-hidden','true');
+      s.style.setProperty('--c', colors[i % colors.length]);
+      s.style.setProperty('--i', i++);
+      word.appendChild(s);
+    });
+    title.appendChild(word);
+    if (wi < words.length - 1) { const sp = document.createElement('span'); sp.className='sp'; title.appendChild(sp); }
+    if (wi === 0) title.appendChild(document.createElement('br'));
+  });
+
+  /* ---------- greetings ---------- */
+  const greets = ['Hoi Zoë!','Ciao Zoë!','Hi Zoë!'];
+  let gi = 0;
+  setInterval(() => {
+    gi = (gi + 1) % greets.length;
+    $('#greet').innerHTML = '<span>' + greets[gi] + '</span>';
+  }, 3200);
+
+  /* ---------- sky: stars + clouds ---------- */
+  const sky = $('#sky');
+  for (let n = 0; n < 60; n++) {
+    const st = document.createElement('i');
+    st.className = 'star' + (n % 9 === 0 ? ' big' : '');
+    st.style.left = Math.random()*100 + 'vw';
+    st.style.top = Math.random()*70 + 'vh';
+    st.style.setProperty('--d', (2 + Math.random()*4) + 's');
+    st.style.setProperty('--o', (.4 + Math.random()*.6).toFixed(2));
+    st.style.animationDelay = (-Math.random()*5) + 's';
+    sky.appendChild(st);
+  }
+  const cloudSVG = '<svg viewBox="0 0 120 50"><path d="M20 46a16 16 0 0 1 2-32 22 22 0 0 1 40-6 18 18 0 0 1 32 8 15 15 0 0 1 6 30z"/></svg>';
+  [[8,140,70,-10],[22,100,90,-45],[40,170,110,-70],[14,80,80,-25]].forEach(([top,w,t,d]) => {
+    const c = document.createElement('div');
+    c.className = 'cloud';
+    c.innerHTML = cloudSVG;
+    c.style.top = top + 'vh'; c.style.width = w + 'px';
+    c.style.setProperty('--t', t + 's'); c.style.setProperty('--delay', d + 's');
+    c.setAttribute('role','button'); c.setAttribute('aria-label','A fluffy cloud');
+    c.addEventListener('click', e => {
+      e.stopPropagation();
+      burst(e.clientX, e.clientY, ['💗','✨','☁️'], 10);
+      c.classList.add('pop'); boop(880, .08);
+      found('cloud', 'You popped a cloud! It’ll come back, clouds always do.');
+      setTimeout(() => { c.classList.remove('pop'); }, 2600);
+    });
+    sky.appendChild(c);
+  });
+
+  /* ---------- day / night ---------- */
+  const root = document.documentElement;
+  const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  $('#orb').addEventListener('click', e => {
+    e.stopPropagation();
+    root.dataset.theme = isDark() ? 'light' : 'dark';
+    boop(isDark() ? 330 : 660, .15);
+    found('night', isDark() ? 'Goodnight, sun! The stars are out.' : 'Good morning! The sun is back.');
+  });
+
+  /* ---------- Spartacus ---------- */
+  const pup = $('#pup'), pupils = $('#pupils'), bubble = $('#bubble');
+  const barks = ['Woof!','Bau bau!','Waf waf!','Play with me?','Snack? 🦴','Ik ben Spartacus!','Ciao bella!','Ear scratches pls','Again! Again!'];
+  let pats = 0, bubbleT;
+  pup.addEventListener('click', e => {
+    e.stopPropagation();
+    pats++;
+    bubble.textContent = barks[Math.floor(Math.random()*barks.length)];
+    bubble.classList.add('show');
+    pup.classList.add('happy');
+    clearTimeout(bubbleT);
+    bubbleT = setTimeout(() => { bubble.classList.remove('show'); pup.classList.remove('happy'); }, 1600);
+    bark();
+    const r = pup.getBoundingClientRect();
+    burst(r.left + r.width/2, r.top + 30, ['💗','💖','🐾'], 6);
+    if (pats === 1) found('pat', 'Spartacus loves pats. Keep going…');
+    if (pats === 7) {
+      pup.classList.remove('spin'); void pup.offsetWidth; pup.classList.add('spin');
+      setTimeout(() => pup.classList.remove('spin'), 1200);
+      found('zoomies', 'Seven pats = ZOOMIES!');
+      pats = 1;
+    }
+  });
+
+  // eyes follow the pointer (Spartacus + the window in Black Dog Lane)
+  const bdlEyes = $('#bdlEyes');
+  addEventListener('pointermove', e => {
+    const r = pup.getBoundingClientRect();
+    const cx = r.left + r.width/2, cy = r.top + r.height*0.35;
+    const a = Math.atan2(e.clientY - cy, e.clientX - cx);
+    const d = Math.min(1, Math.hypot(e.clientX - cx, e.clientY - cy) / 300);
+    pupils.setAttribute('transform', `translate(${Math.cos(a)*3.5*d} ${Math.sin(a)*3.5*d})`);
+    const br = bdlEyes.ownerSVGElement.getBoundingClientRect();
+    const bx = br.left + br.width/2, by = br.top + br.height*0.55;
+    const b = Math.atan2(e.clientY - by, e.clientX - bx);
+    bdlEyes.style.transform = `translate(${Math.cos(b)*3}px, ${Math.sin(b)*2.5}px)`;
+    idle();
+  }, {passive:true});
+
+  /* ---------- card tilt ---------- */
+  document.querySelectorAll('.game').forEach(card => {
+    card.addEventListener('pointermove', e => {
+      if (reduce || e.pointerType !== 'mouse') return;
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left)/r.width - .5, y = (e.clientY - r.top)/r.height - .5;
+      card.style.setProperty('--ry', (x*10) + 'deg');
+      card.style.setProperty('--rx', (-y*8) + 'deg');
+    });
+    card.addEventListener('pointerleave', () => { card.style.setProperty('--rx','0deg'); card.style.setProperty('--ry','0deg'); });
+    card.addEventListener('click', () => boop(520, .1));
+  });
+  // Pup Studio bow changes colour on hover
+  const bow = $('#bow'); const bowCols = ['#ff9ec7','#ffd76a','#a8e6cf','#c9b6ff','#8fd0f0','#ffc6a8']; let bc = 0;
+  document.querySelector('.stu').addEventListener('pointerenter', () => { bc = (bc+1)%bowCols.length; bow.setAttribute('fill', bowCols[bc]); });
+
+  /* ---------- title tap x3 or typing "woof" = paw rain ---------- */
+  let taps = [];
+  title.addEventListener('click', e => {
+    e.stopPropagation();
+    const now = Date.now(); taps = taps.filter(t => now - t < 900); taps.push(now);
+    if (taps.length >= 3) { taps = []; pawRain(); }
+  });
+  let typed = '';
+  addEventListener('keydown', e => {
+    typed = (typed + e.key.toLowerCase()).slice(-12);
+    if (typed.endsWith('woof') || typed.endsWith('bau')) pawRain();
+    if (typed.endsWith('spartacus')) { pup.click(); }
+  });
+  function pawRain(){
+    const emojis = ['🐾','🦴','💗','⭐','🐶'];
+    for (let n = 0; n < (reduce ? 8 : 40); n++) {
+      const f = fx(emojis[n % emojis.length], Math.random()*innerWidth, -30, 18 + Math.random()*22);
+      f.classList.add('fall');
+      f.style.setProperty('--dur', (2.4 + Math.random()*2.4) + 's');
+      f.style.setProperty('--r', (Math.random()*720 - 360) + 'deg');
+      f.style.animationDelay = (Math.random()*1.2) + 's';
+      setTimeout(() => f.remove(), 6000);
+    }
+    bark();
+    found('rain', 'It’s raining paws!');
+  }
+
+  /* ---------- the bone ---------- */
+  $('#bone').addEventListener('click', e => {
+    e.stopPropagation();
+    pup.classList.remove('hop'); void pup.offsetWidth; pup.classList.add('hop', 'happy');
+    setTimeout(() => pup.classList.remove('hop','happy'), 1300);
+    pup.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'center'});
+    setTimeout(bark, 300);
+    found('bone', 'A bone! Spartacus is very, very pleased.');
+  });
+
+  /* ---------- the watcher (wait quietly…) ---------- */
+  const watcher = $('#watcher'); let idleT;
+  function idle(){
+    if (watcher.classList.contains('peek')) return; // stay put so it can be caught
+    clearTimeout(idleT);
+    idleT = setTimeout(() => {
+      watcher.classList.add('peek');
+      setTimeout(() => { watcher.classList.remove('peek'); idle(); }, 7000);
+    }, 20000);
+  }
+  ['pointerdown','keydown','scroll','touchstart'].forEach(ev => addEventListener(ev, idle, {passive:true}));
+  idle();
+  watcher.addEventListener('click', e => {
+    e.stopPropagation();
+    watcher.classList.remove('peek');
+    boop(180, .25);
+    found('watcher', 'You spotted the black dog from the lane. It was only saying hello.');
+  });
+
+  /* ---------- taps leave sparkles ---------- */
+  addEventListener('pointerdown', e => {
+    if (e.target.closest('a,button,.cloud,h1')) return;
+    burst(e.clientX, e.clientY, ['✦','✧','·'], 5, true);
+  });
+
+  /* ---------- secrets ---------- */
+  const SECRETS = ['pat','zoomies','night','cloud','rain','bone','watcher'];
+  const got = new Set();
+  const dots = $('#dots');
+  SECRETS.forEach(() => dots.appendChild(document.createElement('i')));
+  function found(id, msg){
+    if (got.has(id)) return;
+    got.add(id);
+    [...dots.children].forEach((d, k) => d.classList.toggle('on', k < got.size));
+    const left = SECRETS.length - got.size;
+    $('#meterText').textContent = left ? `${got.size} of ${SECRETS.length} secrets found` : 'All secrets found!';
+    toast(left ? `${msg}  (${got.size}/${SECRETS.length})` : '🏆 You found every secret! Spartacus gives you the golden paw. 🐾');
+    if (!left) { setTimeout(pawRainGold, 400); }
+  }
+  function pawRainGold(){
+    for (let n = 0; n < (reduce ? 6 : 50); n++) {
+      const f = fx(['🏆','🌟','🐾','💛'][n%4], Math.random()*innerWidth, -30, 20 + Math.random()*20);
+      f.classList.add('fall'); f.style.setProperty('--dur',(2.5+Math.random()*2)+'s'); f.style.animationDelay=(Math.random()*1.5)+'s';
+      setTimeout(() => f.remove(), 6500);
+    }
+  }
+
+  /* ---------- helpers ---------- */
+  let toastT;
+  function toast(t){ const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 3400); }
+  function fx(ch, x, y, size){
+    const el = document.createElement('span');
+    el.className = 'fx'; el.textContent = ch;
+    el.style.left = x + 'px'; el.style.top = y + 'px'; el.style.fontSize = size + 'px';
+    document.body.appendChild(el); return el;
+  }
+  function burst(x, y, set, n, tiny){
+    for (let k = 0; k < n; k++) {
+      const a = Math.random()*Math.PI*2, d = (tiny ? 20 : 40) + Math.random()*(tiny ? 30 : 60);
+      const el = fx(set[k % set.length], x - 8, y - 10, tiny ? 12 + Math.random()*8 : 18 + Math.random()*10);
+      el.style.color = colors[k % colors.length];
+      el.style.setProperty('--dx', Math.cos(a)*d + 'px');
+      el.style.setProperty('--dy', (Math.sin(a)*d - 20) + 'px');
+      el.classList.add('burst');
+      setTimeout(() => el.remove(), 1000);
+    }
+  }
+  let actx;
+  function ctx(){ try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); return actx; } catch(_) { return null; } }
+  function boop(freq, len){
+    const c = ctx(); if (!c) return;
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(freq, c.currentTime);
+    o.frequency.exponentialRampToValueAtTime(freq*1.5, c.currentTime + len);
+    g.gain.setValueAtTime(.0001, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(.12, c.currentTime + .01);
+    g.gain.exponentialRampToValueAtTime(.0001, c.currentTime + len + .05);
+    o.connect(g).connect(c.destination); o.start(); o.stop(c.currentTime + len + .08);
+  }
+  function bark(){
+    const c = ctx(); if (!c) return;
+    [0, .16].forEach(t => {
+      const o = c.createOscillator(), g = c.createGain(), f = c.createBiquadFilter();
+      o.type = 'sawtooth'; f.type = 'lowpass'; f.frequency.value = 1400;
+      const s = c.currentTime + t;
+      o.frequency.setValueAtTime(520, s); o.frequency.exponentialRampToValueAtTime(260, s + .11);
+      g.gain.setValueAtTime(.0001, s); g.gain.exponentialRampToValueAtTime(.09, s + .015); g.gain.exponentialRampToValueAtTime(.0001, s + .13);
+      o.connect(f).connect(g).connect(c.destination); o.start(s); o.stop(s + .15);
+    });
+  }
+})();
+</script>
+</body>
+</html>
