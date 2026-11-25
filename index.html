@@ -60,7 +60,7 @@ body{
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;
 }
-button,a,.cloud,h1{touch-action:manipulation}
+button,a,h1{touch-action:manipulation}
 button{font:inherit;color:inherit}
 :focus-visible{outline:3px dashed var(--bubblegum);outline-offset:4px;border-radius:12px}
 
@@ -71,9 +71,9 @@ button{font:inherit;color:inherit}
 .star.big::before{content:"✦";position:absolute;left:-6px;top:-10px;font-size:14px;color:#fff6c9}
 @keyframes twinkle{50%{transform:scale(.4);filter:brightness(.6)}}
 .orb{
-  position:absolute;top:calc(28px + env(safe-area-inset-top,0px));right:7vw;width:78px;height:78px;border-radius:50%;
+  position:fixed;top:calc(28px + env(safe-area-inset-top,0px));right:7vw;width:78px;height:78px;border-radius:50%;
   background:var(--orb);box-shadow:0 0 0 14px var(--orb-glow),0 0 60px 20px var(--orb-glow);
-  pointer-events:auto;cursor:pointer;border:0;padding:0;z-index:3;
+  cursor:pointer;border:0;padding:0;z-index:20;
   transition:background .8s, box-shadow .8s, transform .3s cubic-bezier(.3,1.8,.5,1);
 }
 .orb:hover{transform:scale(1.08) rotate(-8deg)}
@@ -81,7 +81,7 @@ button{font:inherit;color:inherit}
 .orb .face{position:absolute;inset:0}
 .orb .crater{position:absolute;border-radius:50%;background:rgba(160,140,210,.35);opacity:var(--star-op);transition:opacity .8s}
 .cloud{
-  position:absolute;pointer-events:auto;cursor:pointer;opacity:var(--cloud-op);
+  position:absolute;opacity:var(--cloud-op);
   transition:opacity .8s, transform .2s;
   animation:drift var(--t,60s) linear infinite;
   animation-delay:var(--delay,0s);
@@ -361,7 +361,7 @@ footer{
 </head>
 <body>
 
-<div class="sky" id="sky" aria-hidden="false">
+<div class="sky" id="sky" aria-hidden="true"></div>
   <button class="orb" id="orb" aria-label="Switch between day and night">
     <span class="face">
       <i class="crater" style="width:16px;height:16px;left:18px;top:20px"></i>
@@ -369,7 +369,6 @@ footer{
       <i class="crater" style="width:7px;height:7px;left:26px;top:50px"></i>
     </span>
   </button>
-</div>
 
 <main>
   <section class="hero">
@@ -794,16 +793,21 @@ footer{
     c.innerHTML = cloudSVG;
     c.style.top = top + 'vh'; c.style.width = w + 'px';
     c.style.setProperty('--t', t + 's'); c.style.setProperty('--delay', d + 's');
-    c.setAttribute('role','button'); c.setAttribute('aria-label','A fluffy cloud');
-    c.addEventListener('click', e => {
-      e.stopPropagation();
-      burst(e.clientX, e.clientY, ['💗','✨','☁️'], 10);
-      c.classList.add('pop'); boop(880, .08);
-      found('cloud', 'You popped a cloud! It’ll come back, clouds always do.');
-      setTimeout(() => { c.classList.remove('pop'); }, 2600);
-    });
     sky.appendChild(c);
   });
+  // The sky sits behind the page, so taps on clouds are matched by position.
+  function popCloud(x, y){
+    const c = [...sky.querySelectorAll('.cloud:not(.pop)')].find(c => {
+      const r = c.getBoundingClientRect();
+      return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+    });
+    if (!c) return false;
+    burst(x, y, ['💗','✨','☁️'], 10);
+    c.classList.add('pop'); boop(880, .08);
+    found('cloud', 'You popped a cloud! It’ll come back, clouds always do.');
+    setTimeout(() => { c.classList.remove('pop'); }, 2600);
+    return true;
+  }
 
   /* ---------- day / night ---------- */
   const root = document.documentElement;
@@ -990,7 +994,8 @@ footer{
 
   /* ---------- taps leave sparkles ---------- */
   addEventListener('pointerdown', e => {
-    if (e.target.closest('a,button,.cloud,h1')) return;
+    if (e.target.closest('a,button,h1')) return;
+    if (popCloud(e.clientX, e.clientY)) return;
     burst(e.clientX, e.clientY, ['✦','✧','·'], 5, true);
   });
 
