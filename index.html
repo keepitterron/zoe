@@ -189,6 +189,8 @@ main{overflow-x:clip}
 .game:nth-child(2){--rest:1.5deg}
 .game:nth-child(3){--rest:-1deg}
 .game:nth-child(4){--rest:2deg}
+.game:nth-child(5){--rest:-1.5deg}
+.game:last-child:nth-child(odd){grid-column:1/-1;justify-self:center;width:calc(50% - 17px)}
 .paw .raft{animation:sail 6s ease-in-out infinite;transform-box:fill-box}
 @keyframes sail{0%,100%{transform:translateX(0) rotate(-3deg)}50%{transform:translateX(62px) rotate(3deg)}}
 .paw .flag{animation:flutter .6s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:0 50%}
@@ -246,6 +248,49 @@ main{overflow-x:clip}
 .stu .sparkle:nth-of-type(3){animation-delay:-1.6s}
 @keyframes spark{0%,100%{transform:scale(.4) rotate(0);opacity:.4}50%{transform:scale(1) rotate(45deg);opacity:1}}
 
+.blk .hopper{animation:hopin 3.2s cubic-bezier(.4,0,.3,1) infinite}
+@keyframes hopin{0%{transform:translate(34px,-70px);opacity:0}12%{opacity:1}38%,82%{transform:translate(0,0);opacity:1}100%{transform:translate(0,0);opacity:0}}
+.blk .digit{animation:shine 3.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+
+/* ---------- ten little blocks on the hill ---------- */
+.cube{
+  position:absolute;left:calc(50% + 150px);bottom:48px;z-index:2;width:22px;height:22px;border:0;padding:0;cursor:pointer;
+  border-radius:5px;background:linear-gradient(140deg,#97DF7E 0%,#52B34A 45%,#3B9136 100%);
+  box-shadow:inset 0 -3px 0 #2B6B27,inset 0 2px 0 rgba(255,255,255,.45),0 4px 8px var(--shadow);
+  animation:cubeBob 2.6s ease-in-out infinite;
+}
+@keyframes cubeBob{50%{translate:0 -4px;rotate:-6deg}}
+.cube:active{scale:.85}
+.tens{
+  position:absolute;left:calc(50% - 250px);bottom:44px;z-index:2;
+  display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;
+}
+.tens .bars{display:flex;flex-direction:column-reverse;gap:3px}
+.tens .bar{
+  width:84px;height:11px;border-radius:3px;
+  background:repeating-linear-gradient(90deg,transparent 0 7.4px,rgba(12,45,95,.5) 7.4px 8.4px),linear-gradient(180deg,#8AC0F4 0%,#5199E4 30%,#3F86DB 62%,#2A69B8 100%);
+  box-shadow:inset 0 0 0 1px rgba(12,45,95,.35),0 2px 0 #1F5BA6;
+  animation:barIn .5s cubic-bezier(.3,1.8,.5,1);
+}
+@keyframes barIn{from{scale:0 1}}
+.tens .frame{
+  display:grid;grid-template-columns:repeat(5,14px);gap:3px;padding:5px;border-radius:8px;
+  background:#E6CFA6;box-shadow:0 3px 0 #C9A874,0 6px 10px var(--shadow);
+  scale:0;transition:scale .35s cubic-bezier(.3,1.8,.5,1);
+}
+.tens.show .frame{scale:1}
+.tens .frame i{width:14px;height:14px;border-radius:3px;background:rgba(90,67,37,.2);transition:background .2s}
+.tens .frame i.on{background:linear-gradient(140deg,#97DF7E,#52B34A 50%,#3B9136);box-shadow:inset 0 -2px 0 #2B6B27}
+.tens .frame.swap{animation:swap .5s ease-in forwards}
+@keyframes swap{to{scale:.2 1;opacity:0}}
+.tens .count{
+  font-family:"Gochi Hand",cursive;font-size:20px;line-height:1;color:#4b3668;
+  background:var(--butter);padding:2px 10px;border-radius:999px;rotate:3deg;opacity:0;transition:opacity .3s;
+}
+.tens.show .count{opacity:1}
+.tens .count .t{color:#1F5BA6}
+.tens .count .e{color:#2B6B27}
+
 /* ---------- footer ---------- */
 footer{
   position:relative;z-index:1;text-align:center;padding:40px 20px 60px;color:var(--ink-soft);
@@ -301,8 +346,11 @@ footer{
   .pup{width:170px}
   .bubble{left:50%;translate:-50% 0;bottom:200px;font-size:19px;transform-origin:50% 100%;border-radius:22px}
   .name-tag{bottom:14px}
+  .cube{left:auto;right:18px;bottom:40px}
+  .tens{left:12px;bottom:36px}
   .shelf{gap:40px;padding:0}
   .game{rotate:0deg}
+  .game:last-child:nth-child(odd){width:auto;justify-self:stretch}
   .sticker{right:6px;top:-12px;width:60px;height:60px;font-size:15px}
 }
 @media (prefers-reduced-motion: reduce){
@@ -327,7 +375,7 @@ footer{
   <section class="hero">
     <p class="greet" id="greet" aria-live="polite"><span>Hoi Zoë!</span></p>
     <h1 id="title" aria-label="Spartacus’s Game Shelf"></h1>
-    <p class="sub">Four little games made at home, for playing together. Pick one and press play.</p>
+    <p class="sub">Five little games made at home, for playing together. Pick one and press play.</p>
 
     <div class="hillwrap">
       <div class="bubble" id="bubble">Woof!</div>
@@ -412,10 +460,75 @@ footer{
         </g>
       </svg>
       <span class="name-tag">Spartacus</span>
+      <div class="tens" id="tens" aria-live="polite">
+        <div class="bars" id="bars"></div>
+        <div class="frame" id="frame10"></div>
+        <span class="count" id="count"></span>
+      </div>
+      <button class="cube" id="cube" aria-label="A little green block"></button>
     </div>
   </section>
 
   <section class="shelf" aria-label="Games">
+    <!-- Blokjes -->
+    <a class="game blk" href="https://keepitterron.github.io/blokjes/" style="--tape:#a8e6cf;--btn:#8fd0f0;--sticker:#ffe08a">
+      <span class="tape"></span>
+      <span class="sticker">new!</span>
+      <div class="art">
+        <svg viewBox="0 0 250 200" aria-hidden="true">
+          <defs>
+            <linearGradient id="mat" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#eef8ea"/><stop offset="1" stop-color="#dcebfb"/>
+            </linearGradient>
+            <linearGradient id="tenbar" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#8AC0F4"/><stop offset=".3" stop-color="#5199E4"/><stop offset=".62" stop-color="#3F86DB"/><stop offset="1" stop-color="#2A69B8"/>
+            </linearGradient>
+            <linearGradient id="one" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#97DF7E"/><stop offset=".5" stop-color="#52B34A"/><stop offset="1" stop-color="#3B9136"/>
+            </linearGradient>
+            <pattern id="notch" width="14" height="10" patternUnits="userSpaceOnUse" y="2">
+              <rect width="14" height="1" y="9" fill="rgba(12,45,95,.5)"/>
+            </pattern>
+            <g id="oneCube"><rect width="20" height="20" rx="4" fill="url(#one)"/><rect y="17" width="20" height="3" rx="1.5" fill="#2B6B27"/></g>
+          </defs>
+          <rect width="250" height="200" fill="url(#mat)"/>
+          <g opacity=".5"><circle cx="24" cy="24" r="5" fill="#a8e6cf"/><circle cx="228" cy="176" r="7" fill="#8fd0f0"/><circle cx="222" cy="22" r="4" fill="#ffe08a"/></g>
+          <!-- the number being built: 2 tens, 8 ones -->
+          <g font-family="Fredoka" font-weight="700" font-size="30" text-anchor="middle">
+            <text x="112" y="40" fill="#1F5BA6">2</text>
+            <text class="digit" x="134" y="40" fill="#2E7A2A">8</text>
+          </g>
+          <!-- wooden tray -->
+          <rect x="18" y="56" width="214" height="124" rx="14" fill="#9A7B4F"/>
+          <rect x="18" y="52" width="214" height="122" rx="14" fill="#E6CFA6"/>
+          <rect x="18" y="52" width="214" height="122" rx="14" fill="none" stroke="#C9A874" stroke-width="3"/>
+          <!-- two tens -->
+          <g>
+            <rect x="36" y="64" width="14" height="100" rx="4" fill="url(#tenbar)"/>
+            <rect x="36" y="64" width="14" height="100" rx="4" fill="url(#notch)"/>
+            <rect x="56" y="64" width="14" height="100" rx="4" fill="url(#tenbar)"/>
+            <rect x="56" y="64" width="14" height="100" rx="4" fill="url(#notch)"/>
+          </g>
+          <!-- ten-frame -->
+          <rect x="84" y="84" width="134" height="58" rx="8" fill="#D2B587"/>
+          <g fill="rgba(90,67,37,.2)">
+            <rect x="90" y="90" width="20" height="20" rx="4"/><rect x="116" y="90" width="20" height="20" rx="4"/><rect x="142" y="90" width="20" height="20" rx="4"/><rect x="168" y="90" width="20" height="20" rx="4"/><rect x="194" y="90" width="20" height="20" rx="4"/>
+            <rect x="90" y="116" width="20" height="20" rx="4"/><rect x="116" y="116" width="20" height="20" rx="4"/><rect x="142" y="116" width="20" height="20" rx="4"/><rect x="168" y="116" width="20" height="20" rx="4"/><rect x="194" y="116" width="20" height="20" rx="4"/>
+          </g>
+          <use href="#oneCube" x="90" y="90"/><use href="#oneCube" x="116" y="90"/><use href="#oneCube" x="142" y="90"/><use href="#oneCube" x="168" y="90"/><use href="#oneCube" x="194" y="90"/>
+          <use href="#oneCube" x="90" y="116"/><use href="#oneCube" x="116" y="116"/>
+          <use class="hopper" href="#oneCube" x="142" y="116"/>
+          <!-- a paw print, Spartacus was here -->
+          <g fill="#C9A874" transform="translate(196 156) rotate(-14)">
+            <ellipse cx="0" cy="4" rx="6" ry="5"/><circle cx="-6" cy="-4" r="2.4"/><circle cx="-2" cy="-7" r="2.4"/><circle cx="3" cy="-7" r="2.4"/><circle cx="7" cy="-4" r="2.4"/>
+          </g>
+        </svg>
+      </div>
+      <h2>Blokjes</h2>
+      <p>Build sums with tens and ones and move every block yourself. Eight sums a day, about five minutes.</p>
+      <span class="play">Let’s build <i class="tri"></i></span>
+    </a>
+
     <!-- Black Dog Lane -->
     <a class="game bdl" href="https://keepitterron.github.io/black-dog-lane/" style="--tape:#c9b6ff;--btn:#c9b6ff;--sticker:#ffe08a">
       <span class="tape"></span>
@@ -619,7 +732,7 @@ footer{
     </button>
   </div>
   <div class="secret-meter" id="meter" title="Secrets hidden on this page">
-    <span id="meterText">7 secrets are hiding here</span>
+    <span id="meterText">8 secrets are hiding here</span>
     <span class="dots" id="dots"></span>
   </div>
 </footer>
@@ -784,6 +897,68 @@ footer{
     found('rain', 'It’s raining paws!');
   }
 
+  /* ---------- ten little blocks: ten ones trade for a ten ---------- */
+  const cube = $('#cube'), tens = $('#tens'), frame10 = $('#frame10'), bars = $('#bars'), count = $('#count');
+  for (let n = 0; n < 10; n++) frame10.appendChild(document.createElement('i'));
+  const scale = [262,294,330,349,392,440,494,523,587,659];
+  let ones = 0, tensN = 0, busy = false;
+  const showCount = () => {
+    const total = tensN * 10 + ones;
+    count.innerHTML = tensN ? `<span class="t">${tensN}</span><span class="e">${ones}</span>` : `<span class="e">${ones}</span>`;
+    cube.setAttribute('aria-label', `A little green block. ${total} so far.`);
+  };
+  cube.addEventListener('click', e => {
+    e.stopPropagation();
+    if (busy) return;
+    if (tensN >= 9 && ones === 0) { say('Ninety! That’s a lot of blocks.'); return; }
+    tens.classList.add('show');
+    const slot = frame10.children[ones];
+    const from = cube.getBoundingClientRect(), to = slot.getBoundingClientRect();
+    const land = () => {
+      slot.classList.add('on');
+      ones++; showCount();
+      boop(scale[ones - 1], .09);
+      if (ones === 10) trade();
+    };
+    if (reduce) { land(); return; }
+    busy = true;
+    const fly = document.createElement('i');
+    fly.className = 'fx';
+    Object.assign(fly.style, {left: from.left + 'px', top: from.top + 'px', width: from.width + 'px', height: from.height + 'px',
+      borderRadius: '5px', background: 'linear-gradient(140deg,#97DF7E,#52B34A 45%,#3B9136)', boxShadow: 'inset 0 -3px 0 #2B6B27'});
+    $('#fxLayer').appendChild(fly);
+    const dx = to.left - from.left, dy = to.top - from.top, k = to.width / from.width;
+    fly.animate([
+      {transform: 'translate(0,0) rotate(0)'},
+      {transform: `translate(${dx/2}px, ${Math.min(dy, 0) - 90}px) rotate(180deg) scale(${(1+k)/2})`},
+      {transform: `translate(${dx}px, ${dy}px) rotate(360deg) scale(${k})`}
+    ], {duration: 520, easing: 'cubic-bezier(.4,0,.4,1)'}).onfinish = () => { fly.remove(); busy = false; land(); };
+  });
+  function trade(){
+    busy = true;
+    setTimeout(() => {
+      boop(523, .1); setTimeout(() => boop(659, .1), 110); setTimeout(() => boop(784, .18), 220);
+      const done = () => {
+        [...frame10.children].forEach(c => c.classList.remove('on'));
+        frame10.classList.remove('swap');
+        ones = 0; tensN++;
+        const b = document.createElement('i'); b.className = 'bar'; bars.appendChild(b);
+        showCount(); busy = false;
+        say(tensN === 1 ? 'Tien!' : `${tensN * 10}!`);
+        found('ten', 'Ten ones make one ten. Inwisselen, just like in Blokjes!');
+      };
+      if (reduce) { done(); return; }
+      frame10.classList.add('swap');
+      setTimeout(done, 500);
+    }, 350);
+  }
+  function say(t){
+    bubble.textContent = t; bubble.classList.add('show'); pup.classList.add('happy');
+    clearTimeout(bubbleT);
+    bubbleT = setTimeout(() => { bubble.classList.remove('show'); pup.classList.remove('happy'); }, 1600);
+    bark();
+  }
+
   /* ---------- the bone ---------- */
   $('#bone').addEventListener('click', e => {
     e.stopPropagation();
@@ -820,7 +995,7 @@ footer{
   });
 
   /* ---------- secrets ---------- */
-  const SECRETS = ['pat','zoomies','night','cloud','rain','bone','watcher'];
+  const SECRETS = ['pat','zoomies','night','cloud','rain','bone','watcher','ten'];
   const got = new Set();
   const dots = $('#dots');
   SECRETS.forEach(() => dots.appendChild(document.createElement('i')));
