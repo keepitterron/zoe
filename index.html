@@ -190,6 +190,7 @@ main{overflow-x:clip}
 .game:nth-child(3){--rest:-1deg}
 .game:nth-child(4){--rest:2deg}
 .game:nth-child(5){--rest:-1.5deg}
+.game:nth-child(6){--rest:1deg}
 .game:last-child:nth-child(odd){grid-column:1/-1;justify-self:center;width:calc(50% - 17px)}
 .paw .raft{animation:sail 6s ease-in-out infinite;transform-box:fill-box}
 @keyframes sail{0%,100%{transform:translateX(0) rotate(-3deg)}50%{transform:translateX(62px) rotate(3deg)}}
@@ -251,6 +252,26 @@ main{overflow-x:clip}
 .blk .hopper{animation:hopin 3.2s cubic-bezier(.4,0,.3,1) infinite}
 @keyframes hopin{0%{transform:translate(34px,-70px);opacity:0}12%{opacity:1}38%,82%{transform:translate(0,0);opacity:1}100%{transform:translate(0,0);opacity:0}}
 .blk .digit{animation:shine 3.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+
+.klk .hh,.klk .mh{transform-box:view-box;transform-origin:125px 102px}
+.klk .mh{animation:klkTurn 9s linear infinite}
+.klk .hh{animation:klkTurn 108s linear infinite;rotate:105deg}
+@keyframes klkTurn{to{transform:rotate(360deg)}}
+
+/* ---------- a little clock on the hill: tick it on to twelve ---------- */
+.klok{
+  position:absolute;left:calc(50% - 160px);bottom:56px;z-index:2;width:38px;height:38px;border:0;padding:0;background:none;cursor:pointer;
+  border-radius:50%;filter:drop-shadow(0 4px 6px var(--shadow));
+}
+.klok::after{content:"";position:absolute;left:50%;top:calc(100% - 2px);translate:-50% 0;z-index:-1;width:6px;height:16px;border-radius:0 0 3px 3px;background:#C9A874;box-shadow:inset -2px 0 0 #A9875A}
+.klok>svg{display:block;width:100%;height:100%;position:relative}
+.klok .h,.klok .m{transform-box:view-box;transform-origin:20px 20px;transition:transform .4s cubic-bezier(.3,1.6,.5,1)}
+.klok:active>svg{scale:.9}
+.klok .bird{position:absolute;left:50%;top:6px;width:24px;z-index:-1;translate:-50% 0;transition:translate .35s cubic-bezier(.3,1.8,.5,1)}
+.klok .bird svg{width:24px;height:auto}
+.klok.cuckoo .bird{translate:-50% -24px}
+.klok.cuckoo>svg{animation:ring .12s linear 6 alternate}
+@keyframes ring{from{rotate:-8deg}to{rotate:8deg}}
 
 /* ---------- ten little blocks on the hill ---------- */
 .cube{
@@ -347,6 +368,7 @@ footer{
   .bubble{left:50%;translate:-50% 0;bottom:200px;font-size:19px;transform-origin:50% 100%;border-radius:22px}
   .name-tag{bottom:14px}
   .cube{left:auto;right:18px;bottom:40px}
+  .klok{left:auto;right:52px;bottom:50px;width:34px;height:34px}
   .tens{left:12px;bottom:36px}
   .shelf{gap:40px;padding:0}
   .game{rotate:0deg}
@@ -374,7 +396,7 @@ footer{
   <section class="hero">
     <p class="greet" id="greet" aria-live="polite"><span>Hoi Zoë!</span></p>
     <h1 id="title" aria-label="Spartacus’s Game Shelf"></h1>
-    <p class="sub">Five little games made at home, for playing together. Pick one and press play.</p>
+    <p class="sub">Six little games made at home, for playing together. Pick one and press play.</p>
 
     <div class="hillwrap">
       <div class="bubble" id="bubble">Woof!</div>
@@ -464,6 +486,16 @@ footer{
         <div class="frame" id="frame10"></div>
         <span class="count" id="count"></span>
       </div>
+      <button class="klok" id="klok" aria-label="A little clock">
+        <span class="bird" aria-hidden="true"><svg viewBox="0 0 24 20"><path d="M3 12c0-5 4-9 9-9s9 4 9 9v2H3z" fill="#ffd76a"/><path d="M8 13c2 3 6 3 8 0" fill="none" stroke="#e8b43c" stroke-width="1.6" stroke-linecap="round"/><path d="M20 8l4 1.5-4 1.5z" fill="#F0662A"/><circle cx="16" cy="7.5" r="1.4" fill="#2C2440"/></svg></span>
+        <svg viewBox="0 0 40 40" aria-hidden="true">
+          <circle cx="20" cy="20" r="19" fill="#7B5BD0"/><circle cx="20" cy="20" r="15.5" fill="#FFFDF8"/>
+          <g fill="#2C2440"><circle cx="20" cy="7.6" r="1.3"/><circle cx="32.4" cy="20" r="1.3"/><circle cx="20" cy="32.4" r="1.3"/><circle cx="7.6" cy="20" r="1.3"/></g>
+          <line class="h" x1="20" y1="21.5" x2="20" y2="12" stroke="#3B57D6" stroke-width="3.6" stroke-linecap="round"/>
+          <line class="m" x1="20" y1="22" x2="20" y2="7.5" stroke="#F0662A" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="20" cy="20" r="2.2" fill="#2C2440"/>
+        </svg>
+      </button>
       <button class="cube" id="cube" aria-label="A little green block"></button>
     </div>
   </section>
@@ -526,6 +558,40 @@ footer{
       <h2>Blokjes</h2>
       <p>Build sums with tens and ones and move every block yourself. Eight sums a day, about five minutes.</p>
       <span class="play">Let’s build <i class="tri"></i></span>
+    </a>
+
+    <!-- Klokje -->
+    <a class="game klk" href="https://keepitterron.github.io/klokje/" style="--tape:#ffc6a8;--btn:#ffc6a8;--sticker:#c9b6ff">
+      <span class="tape"></span>
+      <span class="sticker">new!</span>
+      <div class="art">
+        <svg viewBox="0 0 250 200" aria-hidden="true">
+          <defs>
+            <linearGradient id="klkMat" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fff1e6"/><stop offset="1" stop-color="#efe9ff"/>
+            </linearGradient>
+          </defs>
+          <rect width="250" height="200" fill="url(#klkMat)"/>
+          <g opacity=".5"><circle cx="22" cy="26" r="5" fill="#ffc6a8"/><circle cx="230" cy="172" r="7" fill="#c9b6ff"/><circle cx="226" cy="24" r="4" fill="#a8e6cf"/></g>
+          <!-- the clock, with the Dutch helper quarters: over, voor half, over half, voor -->
+          <circle cx="125" cy="106" r="84" fill="rgba(75,54,104,.12)"/>
+          <circle cx="125" cy="102" r="84" fill="#7B5BD0"/>
+          <circle cx="125" cy="102" r="74" fill="#FFFDF8"/>
+          <g opacity=".75"><path d="M125 102L125.0 28.0A74 74 0 0 1 199.0 102.0Z" fill="#DDF2DC"/><path d="M125 102L199.0 102.0A74 74 0 0 1 125.0 176.0Z" fill="#FFE3CF"/><path d="M125 102L125.0 176.0A74 74 0 0 1 51.0 102.0Z" fill="#DDF2DC"/><path d="M125 102L51.0 102.0A74 74 0 0 1 125.0 28.0Z" fill="#FFE3CF"/></g>
+          <line x1="125.0" y1="40.0" x2="125.0" y2="32.0" stroke="#2C2440" stroke-width="2.2" stroke-linecap="round"/><line x1="131.9" y1="36.36" x2="132.32" y2="32.38" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="138.72" y1="37.44" x2="139.55" y2="33.53" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="145.4" y1="39.23" x2="146.63" y2="35.43" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="151.84" y1="41.71" x2="153.47" y2="38.05" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="156.0" y1="48.31" x2="160.0" y2="41.38" stroke="#2C2440" stroke-width="2.2" stroke-linecap="round"/><line x1="163.79" y1="48.6" x2="166.14" y2="45.37" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="169.16" y1="52.95" x2="171.84" y2="49.98" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="174.05" y1="57.84" x2="177.02" y2="55.16" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="178.4" y1="63.21" x2="181.63" y2="60.86" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="178.69" y1="71.0" x2="185.62" y2="67.0" stroke="#2C2440" stroke-width="2.2" stroke-linecap="round"/><line x1="185.29" y1="75.16" x2="188.95" y2="73.53" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="187.77" y1="81.6" x2="191.57" y2="80.37" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="189.56" y1="88.28" x2="193.47" y2="87.45" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="190.64" y1="95.1" x2="194.62" y2="94.68" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="187.0" y1="102.0" x2="195.0" y2="102.0" stroke="#2C2440" stroke-width="2.2" stroke-linecap="round"/><line x1="190.64" y1="108.9" x2="194.62" y2="109.32" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="189.56" y1="115.72" x2="193.47" y2="116.55" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="187.77" y1="122.4" x2="191.57" y2="123.63" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="185.29" y1="128.84" x2="188.95" y2="130.47" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="178.69" y1="133.0" x2="185.62" y2="137.0" stroke="#2C2440" stroke-width="2.2" stroke-linecap="round"/><line x1="178.4" y1="140.79" x2="181.63" y2="143.14" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="174.05" y1="146.16" x2="177.02" y2="148.84" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="169.16" y1="151.05" x2="171.84" y2="154.02" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="163.79" y1="155.4" x2="166.14" y2="158.63" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="156.0" y1="155.69" x2="160.0" y2="162.62" stroke="#2C2440" stroke-width="2.2" stroke-linecap="round"/><line x1="151.84" y1="162.29" x2="153.47" y2="165.95" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="145.4" y1="164.77" x2="146.63" y2="168.57" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="138.72" y1="166.56" x2="139.55" y2="170.47" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="131.9" y1="167.64" x2="132.32" y2="171.62" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="125.0" y1="164.0" x2="125.0" y2="172.0" stroke="#2C2440" stroke-width="2.2" stroke-linecap="round"/><line x1="118.1" y1="167.64" x2="117.68" y2="171.62" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="111.28" y1="166.56" x2="110.45" y2="170.47" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="104.6" y1="164.77" x2="103.37" y2="168.57" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="98.16" y1="162.29" x2="96.53" y2="165.95" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="94.0" y1="155.69" x2="90.0" y2="162.62" stroke="#2C2440" stroke-width="2.2" stroke-linecap="round"/><line x1="86.21" y1="155.4" x2="83.86" y2="158.63" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="80.84" y1="151.05" x2="78.16" y2="154.02" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="75.95" y1="146.16" x2="72.98" y2="148.84" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="71.6" y1="140.79" x2="68.37" y2="143.14" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="71.31" y1="133.0" x2="64.38" y2="137.0" stroke="#2C2440" stroke-width="2.2" stroke-linecap="round"/><line x1="64.71" y1="128.84" x2="61.05" y2="130.47" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="62.23" y1="122.4" x2="58.43" y2="123.63" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="60.44" y1="115.72" x2="56.53" y2="116.55" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="59.36" y1="108.9" x2="55.38" y2="109.32" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="63.0" y1="102.0" x2="55.0" y2="102.0" stroke="#2C2440" stroke-width="2.2" stroke-linecap="round"/><line x1="59.36" y1="95.1" x2="55.38" y2="94.68" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="60.44" y1="88.28" x2="56.53" y2="87.45" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="62.23" y1="81.6" x2="58.43" y2="80.37" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="64.71" y1="75.16" x2="61.05" y2="73.53" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="71.31" y1="71.0" x2="64.38" y2="67.0" stroke="#2C2440" stroke-width="2.2" stroke-linecap="round"/><line x1="71.6" y1="63.21" x2="68.37" y2="60.86" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="75.95" y1="57.84" x2="72.98" y2="55.16" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="80.84" y1="52.95" x2="78.16" y2="49.98" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="86.21" y1="48.6" x2="83.86" y2="45.37" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="94.0" y1="48.31" x2="90.0" y2="41.38" stroke="#2C2440" stroke-width="2.2" stroke-linecap="round"/><line x1="98.16" y1="41.71" x2="96.53" y2="38.05" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="104.6" y1="39.23" x2="103.37" y2="35.43" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="111.28" y1="37.44" x2="110.45" y2="33.53" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/><line x1="118.1" y1="36.36" x2="117.68" y2="32.38" stroke="#9C93B5" stroke-width="1.1" stroke-linecap="round"/>
+          <g font-family="Fredoka" font-weight="600" font-size="15" fill="#2F49B8" text-anchor="middle" dominant-baseline="central"><text x="149.0" y="60.43">1</text><text x="166.57" y="78.0">2</text><text x="173.0" y="102.0">3</text><text x="166.57" y="126.0">4</text><text x="149.0" y="143.57">5</text><text x="125.0" y="150.0">6</text><text x="101.0" y="143.57">7</text><text x="83.43" y="126.0">8</text><text x="77.0" y="102.0">9</text><text x="83.43" y="78.0">10</text><text x="101.0" y="60.43">11</text><text x="125.0" y="54.0">12</text></g>
+          <line class="hh" x1="125" y1="108" x2="125" y2="66" stroke="#3B57D6" stroke-width="8" stroke-linecap="round"/>
+          <line class="mh" x1="125" y1="111" x2="125" y2="42" stroke="#F0662A" stroke-width="4.5" stroke-linecap="round"/>
+          <circle cx="125" cy="102" r="6" fill="#2C2440"/><circle cx="125" cy="102" r="2.2" fill="#FFFDF8"/>
+          <!-- a paw print, Spartacus was here -->
+          <g fill="#c9b6ff" transform="translate(222 120) rotate(14)">
+            <ellipse cx="0" cy="4" rx="6" ry="5"/><circle cx="-6" cy="-4" r="2.4"/><circle cx="-2" cy="-7" r="2.4"/><circle cx="3" cy="-7" r="2.4"/><circle cx="7" cy="-4" r="2.4"/>
+          </g>
+        </svg>
+      </div>
+      <h2>Klokje</h2>
+      <p>Learn to read the clock, from whole hours to tien voor half vier, and turn the hands yourself. Eight clocks a day, about five minutes.</p>
+      <span class="play">Tick tock <i class="tri"></i></span>
     </a>
 
     <!-- Black Dog Lane -->
@@ -731,7 +797,7 @@ footer{
     </button>
   </div>
   <div class="secret-meter" id="meter" title="Secrets hidden on this page">
-    <span id="meterText">8 secrets are hiding here</span>
+    <span id="meterText">9 secrets are hiding here</span>
     <span class="dots" id="dots"></span>
   </div>
 </footer>
@@ -956,11 +1022,42 @@ footer{
       setTimeout(done, 500);
     }, 350);
   }
-  function say(t){
+  function say(t, quiet){
     bubble.textContent = t; bubble.classList.add('show'); pup.classList.add('happy');
     clearTimeout(bubbleT);
     bubbleT = setTimeout(() => { bubble.classList.remove('show'); pup.classList.remove('happy'); }, 1600);
-    bark();
+    if (!quiet) bark();
+  }
+
+  /* ---------- a little clock: tick it on to twelve and the cuckoo comes out ---------- */
+  const klok = $('#klok'), kHands = [klok.querySelector('.h'), klok.querySelector('.m')];
+  const NLW = ['twaalf','één','twee','drie','vier','vijf','zes','zeven','acht','negen','tien','elf'];
+  const kNow = new Date();
+  let kt = (kNow.getHours() % 12) * 60 + (kNow.getMinutes() >= 30 ? 30 : 0), kTurns = 0, cuckooing = false;
+  // Dutch counts half hours towards the next hour: 3:30 is "half vier".
+  const kSay = t => t % 60 ? `half ${NLW[(Math.floor(t / 60) + 1) % 12]}` : `${NLW[Math.floor(t / 60) % 12]} uur`;
+  const kDraw = () => {
+    kHands[0].style.transform = `rotate(${kt / 2 + kTurns * 360}deg)`;
+    kHands[1].style.transform = `rotate(${(kt % 60) * 6 + kTurns * 4320}deg)`;
+    klok.setAttribute('aria-label', `A little clock. It’s ${kSay(kt)}.`);
+  };
+  kDraw();
+  klok.addEventListener('click', e => {
+    e.stopPropagation();
+    if (cuckooing) return;
+    kt += 30;
+    if (kt >= 720) { kt -= 720; kTurns++; }
+    kDraw();
+    boop(1400, .03);
+    if (kt === 0) cuckoo(); else say(kSay(kt), true);
+  });
+  function cuckoo(){
+    cuckooing = true;
+    klok.classList.add('cuckoo');
+    [0, 700, 1400].forEach(t => { setTimeout(() => boop(784, .1), t); setTimeout(() => boop(622, .16), t + 220); });
+    say('Koekoek! Twaalf uur!', true);
+    found('cuckoo', 'Twaalf uur! The cuckoo came out to say hello, just like the clocks in Klokje.');
+    setTimeout(() => { klok.classList.remove('cuckoo'); cuckooing = false; }, 2300);
   }
 
   /* ---------- the bone ---------- */
@@ -1000,7 +1097,7 @@ footer{
   });
 
   /* ---------- secrets ---------- */
-  const SECRETS = ['pat','zoomies','night','cloud','rain','bone','watcher','ten'];
+  const SECRETS = ['pat','zoomies','night','cloud','rain','bone','watcher','ten','cuckoo'];
   const got = new Set();
   const dots = $('#dots');
   SECRETS.forEach(() => dots.appendChild(document.createElement('i')));
